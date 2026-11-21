@@ -1,4 +1,4 @@
-# RubbleSight – Post-Disaster Search and Rescue (Vision Baseline)
+# RubbleSight – Post-Disaster Search and Rescue with Drones
 
 Public companion repository for my M.Tech dissertation at NSUT, New Delhi:
 *"An Edge-AI Enabled UAV Framework Fusing Vision and RF Sensing for Detection of Visible and Buried Disaster Victims"*
@@ -12,10 +12,10 @@ RubbleSight is a UAV framework that detects both kinds of victim:
 | Component | What it detects | How | Status |
 |---|---|---|---|
 | **Line-of-sight (LOS)** | Visible victims on or around debris | RGB and thermal imaging with deep-learning person detection | Baseline in this repo |
-| **Non-line-of-sight (NLOS)** | Victims buried under rubble | RF sensing (Wi-Fi and radar), which can pass through debris and pick up signs of life such as breathing motion or a victim's phone signals | In development (private) |
+| **Non-line-of-sight (NLOS)** | Victims buried under rubble | RF sensing (Wi-Fi and radar), which can pass through debris and pick up signs of life such as breathing motion or a victim's phone signals | Dataset built ([summary](docs/rs-nlos.md)); method private |
 | **Fusion and edge deployment** | One combined victim map for rescuers | Combining LOS and NLOS evidence onboard the drone in real time | In development (private) |
 
-This public repository contains the **LOS vision baseline** only. The NLOS and fusion components hold the dissertation's novel contribution, so they're developed privately and will be released after the dissertation is evaluated and published.
+This public repository contains the **LOS vision baseline** and a summary of the **NLOS dataset**. The NLOS detection method and the fusion component hold the dissertation's novel contribution, so they're developed privately and will be released after the dissertation is evaluated and published.
 
 The work builds on published research, including PDSR, a post-disaster search-and-rescue UAV framework by Abdellatif et al. (IEEE IoT Magazine, 2025), and airborne UWB radar for vital-sign detection by Jing et al. (Sensors, 2025).
 
@@ -66,12 +66,24 @@ I tested off-the-shelf YOLOv8 models (pretrained on COCO, **no fine-tuning**) on
 
 *Left: 640 px, right: 1280 px (YOLOv8n).*
 
+### 3. NLOS: buried victims (RS-NLOS synthetic dataset)
+
+Cameras can't see people under rubble, so for the NLOS branch I built **RS-NLOS v1.0**, a synthetic radar and Wi-Fi dataset generated with physics models and **NVIDIA Sionna RT** ray tracing: 6,000 UWB radar windows (including 1,200 from 300 ray-traced rubble scenes) and 39,200 Wi-Fi links from 800 collapsed-building scenes.
+
+Headline findings:
+- **Debris material matters more than thickness alone:** radar sees through roughly 25–30 cm of brick but only about 5–10 cm of concrete.
+- **Breathing rate can be measured** with a median error of about **0.5 breaths per minute**.
+- **The drone's own hovering motion is the main obstacle for radar**, because centimetre-scale drift hides millimetre-scale breathing.
+- **Wi-Fi hears 91% of buried phones**, but phones transmit only now and then, so there's a 74% chance of catching one within 2 minutes of hovering.
+
+These are simulation results, not yet validated on real recordings. Details are in the [dataset summary](docs/rs-nlos.md). The data, code and method are private until publication.
+
 ### What comes next
 
 1. **Fine-tuning on disaster imagery**, starting with D-RespNeT's training split, to close the domain gap shown above.
 2. **Thermal imaging**, which helps at night and through light smoke and protects victims' privacy, because faces aren't identifiable.
 3. **Small-object techniques**, such as tiled inference on native-resolution footage.
-4. **NLOS sensing.** Even a perfect camera model can't see victims buried under rubble. That gap is the reason RubbleSight adds RF sensing.
+4. **Validating NLOS on real recordings**, then fusing LOS and NLOS evidence into one victim map onboard the drone.
 
 ## Quick start
 
@@ -98,6 +110,7 @@ Raw metrics for each run are in [`results/`](results/).
 - `src/vision/eval_visdrone.py` – precision/recall on VisDrone
 - `results/` – metrics from each evaluation run
 - `assets/` – example detection images
+- `docs/rs-nlos.md` – summary of the RS-NLOS synthetic radar and Wi-Fi dataset
 - `docs/roadmap.md` – project phases and status
 
 ## Tech stack

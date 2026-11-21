@@ -10,7 +10,9 @@ RubbleSight detects disaster victims from a UAV using two complementary sensing 
 | LOS baseline evaluation | Precision/recall on VisDrone2019-DET val (548 images, 13,969 people) | ✅ Done (Nov 2026) |
 | LOS on disaster data | Baseline on real Turkey 2023 earthquake footage (D-RespNeT, 75 images, 579 people) | ✅ Done (Nov 2026) |
 | LOS improvement | Fine-tuning on disaster imagery (D-RespNeT train split) and thermal data, small-object detection | ⏳ Next |
-| NLOS sensing | RF sensing (Wi-Fi and radar) to detect buried victims through debris | 🔒 In development (private) |
+| NLOS dataset | RS-NLOS v1.0: synthetic radar + Wi-Fi dataset with Sionna RT ray tracing ([summary](rs-nlos.md)) | ✅ Built (Oct 2026) |
+| NLOS detection | Breathing detection under drone motion, Wi-Fi phone detection | 🔒 In development (private) |
+| NLOS validation | Testing on real UWB radar recordings | ⏳ Planned |
 | Fusion and edge deployment | Combined LOS + NLOS victim map, model optimisation for onboard hardware | 🔒 In development (private) |
 | Phase II | Full evaluation, dissertation and paper | ⏳ Planned |
 
