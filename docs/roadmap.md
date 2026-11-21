@@ -1,20 +1,26 @@
 # Roadmap
 
+RubbleSight detects disaster victims from a UAV using two complementary sensing paths:
+**line-of-sight (LOS)** vision for visible victims, and **non-line-of-sight (NLOS)** RF sensing for victims buried under debris.
+
 | Phase | Work | Status |
 |---|---|---|
 | Phase I | Literature review, problem definition, system design | ✅ Completed (Sept 2026) |
-| Vision baseline | Pretrained YOLO person detection on aerial imagery | ✅ Done |
-| Baseline evaluation | Precision/recall on VisDrone2019-DET val (548 images) | ✅ Done (Nov 2026) |
-| Vision module | Fine-tuning on aerial / thermal datasets, small-object detection | ⏳ Next |
-| RF sensing module | Non-line-of-sight detection of buried victims | ⏳ Planned |
-| Fusion and edge deployment | Combined victim-location output, model optimisation | ⏳ Planned |
-| Phase II | Evaluation, dissertation and paper | ⏳ Planned |
+| LOS baseline | Pretrained YOLO person detection on aerial imagery | ✅ Done |
+| LOS baseline evaluation | Precision/recall on VisDrone2019-DET val (548 images, 13,969 people) | ✅ Done (Nov 2026) |
+| LOS on disaster data | Evaluation on disaster-scene aerial imagery (collapsed buildings, debris) | ⏳ Next |
+| LOS improvement | Fine-tuning on aerial and thermal data, small-object detection (tiled inference) | ⏳ Planned |
+| NLOS sensing | RF sensing (Wi-Fi and radar) to detect buried victims through debris | 🔒 In development (private) |
+| Fusion and edge deployment | Combined LOS + NLOS victim map, model optimisation for onboard hardware | 🔒 In development (private) |
+| Phase II | Full evaluation, dissertation and paper | ⏳ Planned |
+
+🔒 = part of the dissertation's novel contribution; released after evaluation and publication.
 
 ## Repository structure
 
 ```
-RubbleSight/
-├── src/vision/        # Detection and evaluation code
+RubbleSight-Drone-Rescue/
+├── src/vision/        # LOS detection and evaluation code
 ├── results/           # Evaluation metrics (JSON)
 ├── assets/            # Example detection images
 ├── docs/              # Roadmap and design notes

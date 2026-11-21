@@ -2,8 +2,9 @@
 RubbleSight - Vision baseline
 -----------------------------
 Baseline person detection on aerial (UAV) images or video using a
-pretrained YOLO model. This is the line-of-sight starting point that
-later modules build on.
+pretrained YOLO model. This is the line-of-sight (LOS) component for
+visible victims; buried victims are handled by the separate
+non-line-of-sight (NLOS) RF sensing module (private, in development).
 
 Usage:
     python src/vision/baseline_detect.py --source path/to/image_or_video

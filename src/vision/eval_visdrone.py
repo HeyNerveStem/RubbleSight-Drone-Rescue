@@ -4,6 +4,11 @@ RubbleSight - Vision baseline evaluation on VisDrone
 Measures how well a pretrained (COCO) YOLO model detects people in real
 drone imagery, using the VisDrone2019-DET validation set as ground truth.
 
+VisDrone shows urban scenes, not disaster sites. It is used as a first
+benchmark for the core line-of-sight (LOS) challenge: tiny people seen from
+altitude. Disaster-scene evaluation is a later stage; the same script works
+on any dataset converted to the VisDrone annotation format.
+
 VisDrone categories 1 (pedestrian) and 2 (people) are treated as "person".
 Regions with score 0 ("ignored regions") are excluded. A detection counts
 as correct when IoU >= 0.5 with an unmatched ground-truth person box.
