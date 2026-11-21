@@ -8,8 +8,8 @@ RubbleSight detects disaster victims from a UAV using two complementary sensing 
 | Phase I | Literature review, problem definition, system design | ✅ Completed (Sept 2026) |
 | LOS baseline | Pretrained YOLO person detection on aerial imagery | ✅ Done |
 | LOS baseline evaluation | Precision/recall on VisDrone2019-DET val (548 images, 13,969 people) | ✅ Done (Nov 2026) |
-| LOS on disaster data | Evaluation on disaster-scene aerial imagery (collapsed buildings, debris) | ⏳ Next |
-| LOS improvement | Fine-tuning on aerial and thermal data, small-object detection (tiled inference) | ⏳ Planned |
+| LOS on disaster data | Baseline on real Turkey 2023 earthquake footage (D-RespNeT, 75 images, 579 people) | ✅ Done (Nov 2026) |
+| LOS improvement | Fine-tuning on disaster imagery (D-RespNeT train split) and thermal data, small-object detection | ⏳ Next |
 | NLOS sensing | RF sensing (Wi-Fi and radar) to detect buried victims through debris | 🔒 In development (private) |
 | Fusion and edge deployment | Combined LOS + NLOS victim map, model optimisation for onboard hardware | 🔒 In development (private) |
 | Phase II | Full evaluation, dissertation and paper | ⏳ Planned |

@@ -19,11 +19,34 @@ This public repository contains the **LOS vision baseline** only. The NLOS and f
 
 The work builds on published research, including PDSR, a post-disaster search-and-rescue UAV framework by Abdellatif et al. (IEEE IoT Magazine, 2025), and airborne UWB radar for vital-sign detection by Jing et al. (Sensors, 2025).
 
-## Baseline results on real drone imagery
+## Baseline results
 
-**Why VisDrone?** Large public datasets of drone footage over real disaster sites are scarce, and that scarcity is part of what this dissertation addresses. As a first benchmark, I used [VisDrone2019-DET](https://github.com/VisDrone/VisDrone-Dataset), the largest public dataset of people seen from drones. Its scenes are urban streets, not rubble, but it tests the core LOS challenge: people who are only a few pixels tall when seen from altitude. Disaster scenes add debris, dust, smoke and partial burial, so **real disaster performance is expected to be lower than these numbers**. Evaluation on disaster-specific data is the next step (see [roadmap](docs/roadmap.md)).
+I tested off-the-shelf YOLOv8 models (pretrained on COCO, **no fine-tuning**) on two kinds of real drone footage: an actual earthquake site, and a large general drone benchmark. A detection counts as correct at IoU ≥ 0.5, confidence threshold 0.25.
 
-I evaluated off-the-shelf YOLOv8 models (pretrained on COCO, **no fine-tuning**) on the full VisDrone validation set: 548 drone images containing 13,969 labelled people (pedestrian + people classes). A detection counts as correct at IoU ≥ 0.5, confidence threshold 0.25.
+### 1. Real earthquake footage: Turkey 2023 (D-RespNeT)
+
+[D-RespNeT](https://app.roboflow.com/cranfield-university-dwusz/phd-project-instance-segmentation/7) (Cranfield University, MIT licence) contains drone footage of collapsed buildings from the 2023 Turkey earthquake, labelled with 28 disaster classes. I used its validation and test splits: **75 images with 579 individually labelled people** (`civilian_visible` and `rescue_team`). Crowds labelled as one region (`group_of_civilians`) are ignored, so detections there are neither rewarded nor penalised.
+
+| Model | Input size | Precision | Recall | F1 |
+|---|---|---|---|---|
+| YOLOv8n | 640 | 0.798 | 0.150 | 0.253 |
+| YOLOv8n | 1280 | 0.687 | 0.159 | 0.258 |
+| YOLOv8s | 640 | 0.800 | 0.131 | 0.226 |
+| YOLOv8s | 1280 | 0.755 | 0.133 | 0.226 |
+
+**What this shows**
+- **A general-purpose detector misses about 85% of people at a real disaster site.** It even misses rescue workers who are clearly visible standing on rubble (first image below).
+- **Neither a bigger model nor higher resolution helps here.** That points to a *domain gap*: rubble, dust, shadows, unusual poses and cluttered backgrounds that COCO-trained models never learned. The fix is training on disaster imagery, not just a larger model.
+- **Caveats:** this is a small sample (75 images). The dataset's images are stored at 640 × 640 with contrast enhancement, which is why upscaling to 1280 adds no detail, and which may also affect a model trained on normal photos.
+
+![Earthquake example 1](assets/earthquake_1.jpg)
+![Earthquake example 2](assets/earthquake_2.jpg)
+
+*Green = labelled people, blue = YOLOv8n detections, orange = crowd regions (ignored).*
+
+### 2. General drone benchmark: VisDrone2019
+
+[VisDrone2019-DET](https://github.com/VisDrone/VisDrone-Dataset) is the largest public dataset of people seen from drones. Its scenes are city streets, not rubble, but it tests the same core challenge at scale: people who are only a few pixels tall. I used the full validation set: **548 images with 13,969 labelled people**.
 
 | Model | Input size | Precision | Recall | F1 | CPU time / image |
 |---|---|---|---|---|---|
@@ -34,22 +57,21 @@ I evaluated off-the-shelf YOLOv8 models (pretrained on COCO, **no fine-tuning**)
 
 *Timing measured on a 2-core CPU without a GPU; edge hardware with acceleration will be much faster.*
 
-**What this shows**
-- **Detections are reliable but most people are missed.** Precision stays above 80%, but even the best setup finds only about 27% of people. From drone altitude, people are only a few pixels tall, and COCO-trained models rarely see targets that small.
-- **Input resolution matters more than model size.** Going from 640 to 1280 px roughly triples recall for YOLOv8n (7.3% → 21.3%), a bigger gain than switching to the larger YOLOv8s at 640.
-- **There is a speed/accuracy trade-off for edge deployment.** Higher resolution and bigger models cost about 3–9× more compute per image.
-
-These results motivate the next stages:
-1. **Fine-tuning on aerial and thermal data.** Thermal imaging also helps at night and through light smoke, and it protects victims' privacy because faces aren't identifiable.
-2. **Small-object techniques**, such as tiled inference, since resolution already proved to be the biggest lever.
-3. **Evaluation on disaster-specific imagery** (collapsed buildings and debris).
-4. **NLOS sensing.** Even a perfect camera model can't see victims buried under rubble. That gap is the reason RubbleSight adds RF sensing.
-
-### Example detections (left: 640 px, right: 1280 px, YOLOv8n)
+- **Detections are reliable, but most people are missed:** precision stays above 80%, yet even the best setup finds only about 27% of people.
+- **On native high-resolution footage, resolution is the biggest lever:** going from 640 to 1280 px roughly triples recall for YOLOv8n (7.3% → 21.3%).
+- **There is a speed/accuracy trade-off for edge deployment:** higher resolution and bigger models cost about 3–9× more compute per image.
 
 ![Comparison 1](assets/compare_1.jpg)
 ![Comparison 2](assets/compare_2.jpg)
-![Comparison 3](assets/compare_3.jpg)
+
+*Left: 640 px, right: 1280 px (YOLOv8n).*
+
+### What comes next
+
+1. **Fine-tuning on disaster imagery**, starting with D-RespNeT's training split, to close the domain gap shown above.
+2. **Thermal imaging**, which helps at night and through light smoke and protects victims' privacy, because faces aren't identifiable.
+3. **Small-object techniques**, such as tiled inference on native-resolution footage.
+4. **NLOS sensing.** Even a perfect camera model can't see victims buried under rubble. That gap is the reason RubbleSight adds RF sensing.
 
 ## Quick start
 
@@ -59,7 +81,11 @@ pip install -r requirements.txt
 # Detect people in an image, video or folder
 python src/vision/baseline_detect.py --source path/to/drone_image.jpg --save
 
-# Reproduce the evaluation (download VisDrone2019-DET-val first)
+# Evaluate on Turkey earthquake footage (D-RespNeT YOLOv8 export)
+python src/vision/eval_respnet.py --data "path/to/D_RespNeT - Instance Segmentation.v7i.yolov8" \
+    --weights yolov8n.pt --imgsz 640 --out results/respnet_yolov8n_640.json
+
+# Evaluate on VisDrone2019-DET-val
 python src/vision/eval_visdrone.py --data path/to/VisDrone2019-DET-val \
     --weights yolov8n.pt --imgsz 1280 --out results/yolov8n_1280.json
 ```
@@ -68,7 +94,8 @@ Raw metrics for each run are in [`results/`](results/).
 
 ## Structure
 - `src/vision/baseline_detect.py` – person detection on images, video or webcam
-- `src/vision/eval_visdrone.py` – precision/recall evaluation against VisDrone ground truth
+- `src/vision/eval_respnet.py` – precision/recall on real earthquake footage (D-RespNeT)
+- `src/vision/eval_visdrone.py` – precision/recall on VisDrone
 - `results/` – metrics from each evaluation run
 - `assets/` – example detection images
 - `docs/roadmap.md` – project phases and status

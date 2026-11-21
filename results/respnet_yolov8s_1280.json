@@ -1,0 +1,18 @@
+{
+  "dataset": "D-RespNeT (Turkey earthquake 2023)",
+  "splits": [
+    "valid",
+    "test"
+  ],
+  "weights": "yolov8s.pt",
+  "imgsz": 1280,
+  "conf": 0.25,
+  "images": 75,
+  "gt_persons": 579,
+  "detections": 102,
+  "true_positives": 77,
+  "precision": 0.7549,
+  "recall": 0.133,
+  "f1": 0.2261,
+  "ms_per_image": 1095.7
+}
