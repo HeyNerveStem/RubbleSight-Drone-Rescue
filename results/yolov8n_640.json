@@ -1,0 +1,13 @@
+{
+  "weights": "yolov8n.pt",
+  "imgsz": 640,
+  "conf": 0.25,
+  "images": 548,
+  "gt_persons": 13969,
+  "detections": 1276,
+  "true_positives": 1022,
+  "precision": 0.8009,
+  "recall": 0.0732,
+  "f1": 0.1341,
+  "ms_per_image": 69.5
+}
